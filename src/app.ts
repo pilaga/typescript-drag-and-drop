@@ -40,10 +40,27 @@ class ProjectInput {
         this.attach();
     }
 
+    private fetchUserInput(): [string, string, number] | void {
+        const inputTitle = this.titleInputElement.value;
+        const inputDesc = this.descInputElement.value;
+        const inputPeople = this.peopleInputElement.value;
+
+        if(inputTitle.trim().length === 0 || inputDesc.trim().length === 0 || inputPeople.trim().length === 0) {
+            alert('invalid input, please try again');
+            return;
+        } else {
+            return [inputTitle, inputDesc, +inputPeople];
+        }
+    }
+
     @Autobind
     private submitHandler(event: Event) {
         event.preventDefault(); //prevent HTTP request from being sent
-        console.log(this.titleInputElement.value);
+        const userInput = this.fetchUserInput();
+        if(Array.isArray(userInput)) {
+            const [title, desc, people] = userInput;
+            console.log(title, desc, people);
+        }
     }
 
     private configure() {

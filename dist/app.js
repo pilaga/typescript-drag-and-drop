@@ -30,9 +30,25 @@ class ProjectInput {
         this.configure();
         this.attach();
     }
+    fetchUserInput() {
+        const inputTitle = this.titleInputElement.value;
+        const inputDesc = this.descInputElement.value;
+        const inputPeople = this.peopleInputElement.value;
+        if (inputTitle.trim().length === 0 || inputDesc.trim().length === 0 || inputPeople.trim().length === 0) {
+            alert('invalid input, please try again');
+            return;
+        }
+        else {
+            return [inputTitle, inputDesc, +inputPeople];
+        }
+    }
     submitHandler(event) {
         event.preventDefault();
-        console.log(this.titleInputElement.value);
+        const userInput = this.fetchUserInput();
+        if (Array.isArray(userInput)) {
+            const [title, desc, people] = userInput;
+            console.log(title, desc, people);
+        }
     }
     configure() {
         this.formElement.addEventListener('submit', this.submitHandler);
