@@ -12,6 +12,36 @@ function Autobind(target: any, methodName: string | Symbol, descriptor: Property
     return adjustedDescriptor;
 }
 
+//user input validation
+interface Validatable {
+    value: string | number;
+    required?: boolean;
+    minLength?: number;
+    maxLength?: number;
+    minValue?: number;
+    maxValue?: number;
+}
+
+function validateUserInput(validatableInput: Validatable) {
+    let isValid = true;
+    if(validatableInput.required) {
+        isValid = isValid && validatableInput.value.toString().trim().length !== 0;
+    }
+    if(validatableInput.minLength != null && typeof validatableInput.value === 'string') {
+        isValid = isValid && validatableInput.value.length >= validatableInput.minLength;
+    }
+    if(validatableInput.maxLength != null && typeof validatableInput.value === 'string') {
+        isValid = isValid && validatableInput.value.length <= validatableInput.maxLength;
+    }
+    if(validatableInput.minValue != null && typeof validatableInput.value === 'number') {
+        isValid = isValid && validatableInput.value >= validatableInput.minValue;
+    }
+    if(validatableInput.maxValue != null && typeof validatableInput.value === 'number') {
+        isValid = isValid && validatableInput.value <= validatableInput.maxValue;
+    }
+    return isValid;
+}
+
 //project input class
 class ProjectInput {
     templateElement: HTMLTemplateElement;
@@ -19,7 +49,7 @@ class ProjectInput {
     appElement: HTMLDivElement;
     titleInputElement: HTMLInputElement;
     descInputElement: HTMLInputElement;
-    peopleInputElement: HTMLInputElement;    
+    teamInputElement: HTMLInputElement;    
 
     constructor() {
         this.templateElement = document.getElementById('project-input')! as HTMLTemplateElement;
@@ -33,7 +63,7 @@ class ProjectInput {
         //grab form input
         this.titleInputElement = this.formElement.querySelector('#title')! as HTMLInputElement;
         this.descInputElement = this.formElement.querySelector('#description')! as HTMLInputElement;
-        this.peopleInputElement = this.formElement.querySelector('#people')! as HTMLInputElement;
+        this.teamInputElement = this.formElement.querySelector('#people')! as HTMLInputElement;
 
         //prepare & render
         this.configure();
@@ -43,14 +73,39 @@ class ProjectInput {
     private fetchUserInput(): [string, string, number] | void {
         const inputTitle = this.titleInputElement.value;
         const inputDesc = this.descInputElement.value;
-        const inputPeople = this.peopleInputElement.value;
+        const inputTeam = this.teamInputElement.value;
 
-        if(inputTitle.trim().length === 0 || inputDesc.trim().length === 0 || inputPeople.trim().length === 0) {
-            alert('invalid input, please try again');
-            return;
-        } else {
-            return [inputTitle, inputDesc, +inputPeople];
+        const titleValidatable: Validatable = {
+            value: inputTitle,
+            required: true
         }
+        const descValidatable: Validatable = {
+            value: inputDesc,
+            required: true,
+            minLength: 5
+        }
+        const teamValidatable: Validatable = {
+            value: +inputTeam,
+            required: true,
+            minValue: 1,
+            maxValue: 5
+        }
+
+        if(
+            !validateUserInput(titleValidatable) ||
+            !validateUserInput(descValidatable) ||
+            !validateUserInput(teamValidatable)) {
+                console.log('error, please check input')
+                return;
+        } else {
+            return [inputTitle, inputDesc, +inputTeam];
+        }
+    }
+
+    private clearUserInput() {
+        this.titleInputElement.value = "";
+        this.descInputElement.value = "";
+        this.teamInputElement.value = "";
     }
 
     @Autobind
@@ -61,6 +116,8 @@ class ProjectInput {
             const [title, desc, people] = userInput;
             console.log(title, desc, people);
         }
+
+        this.clearUserInput();
     }
 
     private configure() {
