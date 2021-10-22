@@ -14,7 +14,7 @@ function Autobind(target: any, methodName: string | Symbol, descriptor: Property
 }
 
 //-----------------------------------------------------------------------------------------------------
-//user input validation
+//Validatable interface
 interface Validatable {
     value: string | number;
     required?: boolean;
@@ -24,6 +24,7 @@ interface Validatable {
     maxValue?: number;
 }
 
+//user input validation
 function validateUserInput(validatableInput: Validatable) {
     let isValid = true;
     if(validatableInput.required) {
@@ -45,26 +46,85 @@ function validateUserInput(validatableInput: Validatable) {
 }
 
 //-----------------------------------------------------------------------------------------------------
+//project state management class
+class ProjectState {    
+    private static instance: ProjectState;
+    private listeners: any[] = [];  //list of listeners to notify objects of changes
+    private projects: any[] = [];
+
+    private constructor() {
+
+    }
+
+    static getInstance() {
+        if(!this.instance) {
+            this.instance = new ProjectState();        
+        }
+        return this.instance;
+    }
+
+    addProject(title: string, description: string, team: number, status?: string) {
+        const newProject = {
+            id: Math.random().toString(),
+            title: title,
+            description: description,
+            team: team,
+            status: status
+        };
+        this.projects.push(newProject);
+        this.callListeners();
+    }
+
+    addListener(listenerFunction: Function) {
+        this.listeners.push(listenerFunction);
+    }
+
+    private callListeners() {
+        for(const listenerFunction of this.listeners) {
+            listenerFunction(this.projects.slice());    //slice() to only return a copy
+        }
+    }
+}
+
+const projectState = ProjectState.getInstance();
+
+//-----------------------------------------------------------------------------------------------------
 //project list class
 class ProjectList {
     templateElement: HTMLTemplateElement;
     appElement: HTMLDivElement;
     mainElement: HTMLElement; //<section> element
+    assignedProjects: any[];
 
     constructor(private type: 'active' | 'finished') { //project is either active or completed
         this.templateElement = document.getElementById('project-list')! as HTMLTemplateElement;
         this.appElement = document.getElementById('app')! as HTMLDivElement;
+        this.assignedProjects = [];
 
         //grab section element
         const importedNode = document.importNode(this.templateElement.content, true);
         this.mainElement = importedNode.firstElementChild as HTMLFormElement;
         this.mainElement.id = `${this.type}-projects`;
 
+        projectState.addListener((projects: any[]) => {
+            this.assignedProjects = projects;
+            this.renderProjects();
+        });
+
         this.attach();
-        this.render();
+        this.renderList();
     }
 
-    private render() {
+    private renderProjects() {
+        const listElement = document.getElementById(`${this.type}-projects-list`)! as HTMLUListElement;
+        for(const item of this.assignedProjects) {
+            const listItem = document.createElement('li');
+            listItem.textContent = item.title;
+            listElement.appendChild(listItem);
+        }
+    }
+
+    private renderList() {
         const listId = `${this.type}-projects-list`;
         this.mainElement.querySelector('ul')!.id = listId;
         this.mainElement.querySelector('h2')!.textContent = this.type.toUpperCase() + ' PROJECTS';
@@ -148,12 +208,12 @@ class ProjectInput {
         event.preventDefault();
         const userInput = this.fetchUserInput();
         if(Array.isArray(userInput)) {
-            const [title, desc, people] = userInput;
+            const [title, desc, team] = userInput;
 
-            console.log(title, desc, people);
-        }
-
-        this.clearUserInput();
+            projectState.addProject(title, desc, team);
+            console.log(title, desc, team);
+            this.clearUserInput();
+        }       
     }
 
     private configure() {
