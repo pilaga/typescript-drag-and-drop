@@ -1,3 +1,4 @@
+//-----------------------------------------------------------------------------------------------------
 //autobind decorator
 function Autobind(target: any, methodName: string | Symbol, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
@@ -12,6 +13,7 @@ function Autobind(target: any, methodName: string | Symbol, descriptor: Property
     return adjustedDescriptor;
 }
 
+//-----------------------------------------------------------------------------------------------------
 //user input validation
 interface Validatable {
     value: string | number;
@@ -42,11 +44,43 @@ function validateUserInput(validatableInput: Validatable) {
     return isValid;
 }
 
+//-----------------------------------------------------------------------------------------------------
+//project list class
+class ProjectList {
+    templateElement: HTMLTemplateElement;
+    appElement: HTMLDivElement;
+    mainElement: HTMLElement; //<section> element
+
+    constructor(private type: 'active' | 'finished') { //project is either active or completed
+        this.templateElement = document.getElementById('project-list')! as HTMLTemplateElement;
+        this.appElement = document.getElementById('app')! as HTMLDivElement;
+
+        //grab section element
+        const importedNode = document.importNode(this.templateElement.content, true);
+        this.mainElement = importedNode.firstElementChild as HTMLFormElement;
+        this.mainElement.id = `${this.type}-projects`;
+
+        this.attach();
+        this.render();
+    }
+
+    private render() {
+        const listId = `${this.type}-projects-list`;
+        this.mainElement.querySelector('ul')!.id = listId;
+        this.mainElement.querySelector('h2')!.textContent = this.type.toUpperCase() + ' PROJECTS';
+    }
+
+    private attach() {
+        this.appElement.insertAdjacentElement('beforeend', this.mainElement);        
+    }
+}
+
+//-----------------------------------------------------------------------------------------------------
 //project input class
 class ProjectInput {
     templateElement: HTMLTemplateElement;
-    formElement: HTMLFormElement;
     appElement: HTMLDivElement;
+    mainElement: HTMLFormElement;    
     titleInputElement: HTMLInputElement;
     descInputElement: HTMLInputElement;
     teamInputElement: HTMLInputElement;    
@@ -57,13 +91,13 @@ class ProjectInput {
 
         //grab form element
         const importedNode = document.importNode(this.templateElement.content, true);
-        this.formElement = importedNode.firstElementChild as HTMLFormElement;
-        this.formElement.id = 'user-input';
+        this.mainElement = importedNode.firstElementChild as HTMLFormElement;
+        this.mainElement.id = 'user-input';
 
         //grab form input
-        this.titleInputElement = this.formElement.querySelector('#title')! as HTMLInputElement;
-        this.descInputElement = this.formElement.querySelector('#description')! as HTMLInputElement;
-        this.teamInputElement = this.formElement.querySelector('#people')! as HTMLInputElement;
+        this.titleInputElement = this.mainElement.querySelector('#title')! as HTMLInputElement;
+        this.descInputElement = this.mainElement.querySelector('#description')! as HTMLInputElement;
+        this.teamInputElement = this.mainElement.querySelector('#people')! as HTMLInputElement;
 
         //prepare & render
         this.configure();
@@ -91,6 +125,7 @@ class ProjectInput {
             maxValue: 5
         }
 
+        //check input
         if(
             !validateUserInput(titleValidatable) ||
             !validateUserInput(descValidatable) ||
@@ -110,10 +145,11 @@ class ProjectInput {
 
     @Autobind
     private submitHandler(event: Event) {
-        event.preventDefault(); //prevent HTTP request from being sent
+        event.preventDefault();
         const userInput = this.fetchUserInput();
         if(Array.isArray(userInput)) {
             const [title, desc, people] = userInput;
+
             console.log(title, desc, people);
         }
 
@@ -121,12 +157,14 @@ class ProjectInput {
     }
 
     private configure() {
-        this.formElement.addEventListener('submit', this.submitHandler);
+        this.mainElement.addEventListener('submit', this.submitHandler);
     }
 
     private attach() {
-        this.appElement.insertAdjacentElement('afterbegin', this.formElement);
+        this.appElement.insertAdjacentElement('afterbegin', this.mainElement);
     }
 }
 
 const project = new ProjectInput();
+const activeProjectList = new ProjectList('active');
+const finishedProjectList = new ProjectList('finished');

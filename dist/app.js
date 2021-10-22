@@ -36,16 +36,36 @@ function validateUserInput(validatableInput) {
     }
     return isValid;
 }
+class ProjectList {
+    constructor(type) {
+        this.type = type;
+        this.templateElement = document.getElementById('project-list');
+        this.appElement = document.getElementById('app');
+        const importedNode = document.importNode(this.templateElement.content, true);
+        this.mainElement = importedNode.firstElementChild;
+        this.mainElement.id = `${this.type}-projects`;
+        this.attach();
+        this.render();
+    }
+    render() {
+        const listId = `${this.type}-projects-list`;
+        this.mainElement.querySelector('ul').id = listId;
+        this.mainElement.querySelector('h2').textContent = this.type.toUpperCase() + ' PROJECTS';
+    }
+    attach() {
+        this.appElement.insertAdjacentElement('beforeend', this.mainElement);
+    }
+}
 class ProjectInput {
     constructor() {
         this.templateElement = document.getElementById('project-input');
         this.appElement = document.getElementById('app');
         const importedNode = document.importNode(this.templateElement.content, true);
-        this.formElement = importedNode.firstElementChild;
-        this.formElement.id = 'user-input';
-        this.titleInputElement = this.formElement.querySelector('#title');
-        this.descInputElement = this.formElement.querySelector('#description');
-        this.teamInputElement = this.formElement.querySelector('#people');
+        this.mainElement = importedNode.firstElementChild;
+        this.mainElement.id = 'user-input';
+        this.titleInputElement = this.mainElement.querySelector('#title');
+        this.descInputElement = this.mainElement.querySelector('#description');
+        this.teamInputElement = this.mainElement.querySelector('#people');
         this.configure();
         this.attach();
     }
@@ -93,14 +113,16 @@ class ProjectInput {
         this.clearUserInput();
     }
     configure() {
-        this.formElement.addEventListener('submit', this.submitHandler);
+        this.mainElement.addEventListener('submit', this.submitHandler);
     }
     attach() {
-        this.appElement.insertAdjacentElement('afterbegin', this.formElement);
+        this.appElement.insertAdjacentElement('afterbegin', this.mainElement);
     }
 }
 __decorate([
     Autobind
 ], ProjectInput.prototype, "submitHandler", null);
 const project = new ProjectInput();
+const activeProjectList = new ProjectList('active');
+const finishedProjectList = new ProjectList('finished');
 //# sourceMappingURL=app.js.map
