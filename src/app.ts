@@ -46,11 +46,28 @@ function validateUserInput(validatableInput: Validatable) {
 }
 
 //-----------------------------------------------------------------------------------------------------
+//project item class
+enum ProjectStatus { Active, Finished }
+
+class Project {
+    constructor(
+        public id: string,
+        public title: string,
+        public description: string,
+        public team: number,
+        public status: ProjectStatus
+        ) {}
+}
+
+//Listener type is a function that receives an array of projects
+type Listener = (items: Project[]) => void; 
+
+//-----------------------------------------------------------------------------------------------------
 //project state management class
 class ProjectState {    
     private static instance: ProjectState;
-    private listeners: any[] = [];  //list of listeners to notify objects of changes
-    private projects: any[] = [];
+    private listeners: Listener[] = [];  //list of listeners to notify objects of changes
+    private projects: Project[] = [];
 
     private constructor() {
 
@@ -64,18 +81,13 @@ class ProjectState {
     }
 
     addProject(title: string, description: string, team: number, status?: string) {
-        const newProject = {
-            id: Math.random().toString(),
-            title: title,
-            description: description,
-            team: team,
-            status: status
-        };
+        let id = Math.random().toString();
+        const newProject = new Project(id, title, description, team, ProjectStatus.Active);
         this.projects.push(newProject);
         this.callListeners();
     }
 
-    addListener(listenerFunction: Function) {
+    addListener(listenerFunction: Listener) {
         this.listeners.push(listenerFunction);
     }
 
@@ -94,7 +106,7 @@ class ProjectList {
     templateElement: HTMLTemplateElement;
     appElement: HTMLDivElement;
     mainElement: HTMLElement; //<section> element
-    assignedProjects: any[];
+    assignedProjects: Project[];
 
     constructor(private type: 'active' | 'finished') { //project is either active or completed
         this.templateElement = document.getElementById('project-list')! as HTMLTemplateElement;
@@ -106,7 +118,7 @@ class ProjectList {
         this.mainElement = importedNode.firstElementChild as HTMLFormElement;
         this.mainElement.id = `${this.type}-projects`;
 
-        projectState.addListener((projects: any[]) => {
+        projectState.addListener((projects: Project[]) => {
             this.assignedProjects = projects;
             this.renderProjects();
         });

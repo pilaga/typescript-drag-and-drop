@@ -36,6 +36,20 @@ function validateUserInput(validatableInput) {
     }
     return isValid;
 }
+var ProjectStatus;
+(function (ProjectStatus) {
+    ProjectStatus[ProjectStatus["Active"] = 0] = "Active";
+    ProjectStatus[ProjectStatus["Finished"] = 1] = "Finished";
+})(ProjectStatus || (ProjectStatus = {}));
+class Project {
+    constructor(id, title, description, team, status) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.team = team;
+        this.status = status;
+    }
+}
 class ProjectState {
     constructor() {
         this.listeners = [];
@@ -48,13 +62,8 @@ class ProjectState {
         return this.instance;
     }
     addProject(title, description, team, status) {
-        const newProject = {
-            id: Math.random().toString(),
-            title: title,
-            description: description,
-            team: team,
-            status: status
-        };
+        let id = Math.random().toString();
+        const newProject = new Project(id, title, description, team, ProjectStatus.Active);
         this.projects.push(newProject);
         this.callListeners();
     }
