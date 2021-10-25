@@ -102,22 +102,46 @@ const projectState = ProjectState.getInstance();
 
 //-----------------------------------------------------------------------------------------------------
 //project list class
-class ProjectList {
+abstract class Component<T extends HTMLElement, U extends HTMLElement> {
     templateElement: HTMLTemplateElement;
-    appElement: HTMLDivElement;
-    mainElement: HTMLElement; //<section> element
-    assignedProjects: Project[];
+    appElement: T;
+    mainElement: U;
 
-    constructor(private type: 'active' | 'finished') { //project is either active or completed
-        this.templateElement = document.getElementById('project-list')! as HTMLTemplateElement;
-        this.appElement = document.getElementById('app')! as HTMLDivElement;
-        this.assignedProjects = [];
+    constructor(templateId: string, appElementId: string, insertAtStart: boolean, newElementId?: string)
+    {
+        this.templateElement = document.getElementById(templateId)! as HTMLTemplateElement;
+        this.appElement = document.getElementById(appElementId)! as T;
 
         //grab section element
         const importedNode = document.importNode(this.templateElement.content, true);
-        this.mainElement = importedNode.firstElementChild as HTMLFormElement;
-        this.mainElement.id = `${this.type}-projects`;
+        this.mainElement = importedNode.firstElementChild as U;
 
+        if(newElementId) {
+            this.mainElement.id = newElementId;
+        }
+
+        this.attach(insertAtStart);
+    }
+
+    private attach(insertAtStart: boolean) {
+        this.appElement.insertAdjacentElement(insertAtStart? 'afterbegin':'beforeend', this.mainElement);              
+    }
+
+    abstract configure(): void;
+    abstract render(): void;
+}
+
+
+//-----------------------------------------------------------------------------------------------------
+//project list class
+class ProjectList extends Component<HTMLDivElement, HTMLElement> {
+    assignedProjects: Project[];
+
+    constructor(private type: 'active' | 'finished') { //project is either active or completed
+        super('project-list', 'app', false, `${type}-projects`);
+        this.assignedProjects = [];
+
+        //grab section element
         projectState.addListener((projects: Project[]) => {
             const filteredProject = projects.filter(proj => { 
                 if(this.type === 'active') {
@@ -129,8 +153,7 @@ class ProjectList {
             this.renderProjects();
         });
 
-        this.attach();
-        this.renderList();
+        this.render();
     }
 
     private renderProjects() {
@@ -143,44 +166,31 @@ class ProjectList {
         }
     }
 
-    private renderList() {
+    render() {
         const listId = `${this.type}-projects-list`;
         this.mainElement.querySelector('ul')!.id = listId;
         this.mainElement.querySelector('h2')!.textContent = this.type.toUpperCase() + ' PROJECTS';
-    }
+    }   
 
-    private attach() {
-        this.appElement.insertAdjacentElement('beforeend', this.mainElement);        
-    }
+    configure() {}
 }
 
 //-----------------------------------------------------------------------------------------------------
 //project input class
-class ProjectInput {
-    templateElement: HTMLTemplateElement;
-    appElement: HTMLDivElement;
-    mainElement: HTMLFormElement;    
+class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {  
     titleInputElement: HTMLInputElement;
     descInputElement: HTMLInputElement;
     teamInputElement: HTMLInputElement;    
 
     constructor() {
-        this.templateElement = document.getElementById('project-input')! as HTMLTemplateElement;
-        this.appElement = document.getElementById('app')! as HTMLDivElement;
-
-        //grab form element
-        const importedNode = document.importNode(this.templateElement.content, true);
-        this.mainElement = importedNode.firstElementChild as HTMLFormElement;
-        this.mainElement.id = 'user-input';
+        super('project-input', 'app', true, 'user-input');
 
         //grab form input
         this.titleInputElement = this.mainElement.querySelector('#title')! as HTMLInputElement;
         this.descInputElement = this.mainElement.querySelector('#description')! as HTMLInputElement;
         this.teamInputElement = this.mainElement.querySelector('#people')! as HTMLInputElement;
 
-        //prepare & render
         this.configure();
-        this.attach();
     }
 
     private fetchUserInput(): [string, string, number] | void {
@@ -235,13 +245,12 @@ class ProjectInput {
         }       
     }
 
-    private configure() {
-        this.mainElement.addEventListener('submit', this.submitHandler);
+    configure() {
+        //submit handler
+        this.mainElement.addEventListener('submit', this.submitHandler);        
     }
 
-    private attach() {
-        this.appElement.insertAdjacentElement('afterbegin', this.mainElement);
-    }
+    render() {}
 }
 
 const project = new ProjectInput();
