@@ -139,6 +139,32 @@ class ProjectList extends Component {
         super('project-list', 'app', false, `${type}-projects`);
         this.type = type;
         this.assignedProjects = [];
+        this.configure();
+        this.render();
+    }
+    renderProjects() {
+        const listElement = document.getElementById(`${this.type}-projects-list`);
+        listElement.innerHTML = '';
+        for (const item of this.assignedProjects) {
+            new ProjectItem(this.mainElement.querySelector('ul').id, item);
+        }
+    }
+    dragOverHandler(event) {
+        const listElement = this.mainElement.querySelector('ul');
+        listElement.classList.add('droppable');
+    }
+    dropHandler(event) {
+    }
+    dragLeaveHandler(event) {
+        const listElement = this.mainElement.querySelector('ul');
+        listElement.classList.remove('droppable');
+    }
+    render() {
+        const listId = `${this.type}-projects-list`;
+        this.mainElement.querySelector('ul').id = listId;
+        this.mainElement.querySelector('h2').textContent = this.type.toUpperCase() + ' PROJECTS';
+    }
+    configure() {
         projectState.addListener((projects) => {
             const filteredProject = projects.filter(proj => {
                 if (this.type === 'active') {
@@ -149,22 +175,20 @@ class ProjectList extends Component {
             this.assignedProjects = filteredProject;
             this.renderProjects();
         });
-        this.render();
+        this.mainElement.addEventListener('dragover', this.dragOverHandler);
+        this.mainElement.addEventListener('dragleave', this.dragLeaveHandler);
+        this.mainElement.addEventListener('drop', this.dropHandler);
     }
-    renderProjects() {
-        const listElement = document.getElementById(`${this.type}-projects-list`);
-        listElement.innerHTML = '';
-        for (const item of this.assignedProjects) {
-            new ProjectItem(this.mainElement.querySelector('ul').id, item);
-        }
-    }
-    render() {
-        const listId = `${this.type}-projects-list`;
-        this.mainElement.querySelector('ul').id = listId;
-        this.mainElement.querySelector('h2').textContent = this.type.toUpperCase() + ' PROJECTS';
-    }
-    configure() { }
 }
+__decorate([
+    Autobind
+], ProjectList.prototype, "dragOverHandler", null);
+__decorate([
+    Autobind
+], ProjectList.prototype, "dropHandler", null);
+__decorate([
+    Autobind
+], ProjectList.prototype, "dragLeaveHandler", null);
 class ProjectInput extends Component {
     constructor() {
         super('project-input', 'app', true, 'user-input');

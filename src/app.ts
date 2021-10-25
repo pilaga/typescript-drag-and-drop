@@ -192,13 +192,49 @@ class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> implements 
 
 //-----------------------------------------------------------------------------------------------------
 //project list class
-class ProjectList extends Component<HTMLDivElement, HTMLElement> {
+class ProjectList extends Component<HTMLDivElement, HTMLElement> implements DragTarget {
     assignedProjects: Project[];
 
     constructor(private type: 'active' | 'finished') { //project is either active or completed
         super('project-list', 'app', false, `${type}-projects`);
         this.assignedProjects = [];
 
+        this.configure();
+        this.render();
+    }
+
+    private renderProjects() {
+        const listElement = document.getElementById(`${this.type}-projects-list`)! as HTMLUListElement;
+        listElement.innerHTML = ''; //empty list
+        for(const item of this.assignedProjects) {            
+            new ProjectItem(this.mainElement.querySelector('ul')!.id, item);
+        }
+    }
+
+    @Autobind
+    dragOverHandler(event: DragEvent) {
+        const listElement = this.mainElement.querySelector('ul')!;// as HTMLUListElement;
+        listElement.classList.add('droppable');
+    }
+
+    @Autobind
+    dropHandler(event: DragEvent) {
+
+    }
+
+    @Autobind
+    dragLeaveHandler(event: DragEvent) {
+        const listElement = this.mainElement.querySelector('ul')!;
+        listElement.classList.remove('droppable');
+    }
+
+    render() {
+        const listId = `${this.type}-projects-list`;
+        this.mainElement.querySelector('ul')!.id = listId;
+        this.mainElement.querySelector('h2')!.textContent = this.type.toUpperCase() + ' PROJECTS';
+    }   
+
+    configure() {
         //grab section element
         projectState.addListener((projects: Project[]) => {
             const filteredProject = projects.filter(proj => { 
@@ -211,24 +247,11 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
             this.renderProjects();
         });
 
-        this.render();
+        //drag listeners
+        this.mainElement.addEventListener('dragover', this.dragOverHandler);
+        this.mainElement.addEventListener('dragleave', this.dragLeaveHandler);
+        this.mainElement.addEventListener('drop', this.dropHandler);
     }
-
-    private renderProjects() {
-        const listElement = document.getElementById(`${this.type}-projects-list`)! as HTMLUListElement;
-        listElement.innerHTML = ''; //empty list
-        for(const item of this.assignedProjects) {            
-            new ProjectItem(this.mainElement.querySelector('ul')!.id, item);
-        }
-    }
-
-    render() {
-        const listId = `${this.type}-projects-list`;
-        this.mainElement.querySelector('ul')!.id = listId;
-        this.mainElement.querySelector('h2')!.textContent = this.type.toUpperCase() + ' PROJECTS';
-    }   
-
-    configure() {}
 }
 
 //-----------------------------------------------------------------------------------------------------
