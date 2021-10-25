@@ -50,9 +50,17 @@ class Project {
         this.status = status;
     }
 }
-class ProjectState {
+class State {
     constructor() {
         this.listeners = [];
+    }
+    addListener(listernerFunction) {
+        this.listeners.push(listernerFunction);
+    }
+}
+class ProjectState extends State {
+    constructor() {
+        super();
         this.projects = [];
     }
     static getInstance() {
@@ -66,9 +74,6 @@ class ProjectState {
         const newProject = new Project(id, title, description, team, ProjectStatus.Active);
         this.projects.push(newProject);
         this.callListeners();
-    }
-    addListener(listenerFunction) {
-        this.listeners.push(listenerFunction);
     }
     callListeners() {
         for (const listenerFunction of this.listeners) {

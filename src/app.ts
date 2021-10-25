@@ -60,17 +60,24 @@ class Project {
 }
 
 //Listener type is a function that receives an array of projects
-type Listener = (items: Project[]) => void; 
+type Listener<T> = (items: T[]) => void; 
+
+//base State class
+class State<T> {
+    protected listeners: Listener<T>[] = [];
+    addListener(listernerFunction: Listener<T>) {
+        this.listeners.push(listernerFunction);
+    }
+}
 
 //-----------------------------------------------------------------------------------------------------
 //project state management class
-class ProjectState {    
+class ProjectState extends State<Project> {    
     private static instance: ProjectState;
-    private listeners: Listener[] = [];  //list of listeners to notify objects of changes
     private projects: Project[] = [];
 
     private constructor() {
-
+        super();
     }
 
     static getInstance() {
@@ -85,10 +92,6 @@ class ProjectState {
         const newProject = new Project(id, title, description, team, ProjectStatus.Active);
         this.projects.push(newProject);
         this.callListeners();
-    }
-
-    addListener(listenerFunction: Listener) {
-        this.listeners.push(listenerFunction);
     }
 
     private callListeners() {
