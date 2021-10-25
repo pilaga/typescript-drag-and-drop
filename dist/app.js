@@ -118,7 +118,8 @@ class ProjectItem extends Component {
         this.mainElement.querySelector('p').textContent = this.project.description;
     }
     dragStartHandler(event) {
-        console.log(event);
+        event.dataTransfer.setData('text/plain', this.project.id);
+        event.dataTransfer.effectAllowed = 'move';
     }
     dragEndHandler(event) {
         console.log('DragEnd');
@@ -150,10 +151,14 @@ class ProjectList extends Component {
         }
     }
     dragOverHandler(event) {
-        const listElement = this.mainElement.querySelector('ul');
-        listElement.classList.add('droppable');
+        if (event.dataTransfer && event.dataTransfer.types[0] === 'text/plain') {
+            event.preventDefault();
+            const listElement = this.mainElement.querySelector('ul');
+            listElement.classList.add('droppable');
+        }
     }
     dropHandler(event) {
+        let id = event.dataTransfer.getData('text/plain');
     }
     dragLeaveHandler(event) {
         const listElement = this.mainElement.querySelector('ul');
@@ -255,6 +260,4 @@ const finishedProjectList = new ProjectList('finished');
 let debug = ProjectState.getInstance();
 debug.addProject('Specs, sitemap and wireframe', 'Write full specificaton document according to customer\'s requirements. Generate sitemap and wireframes.', 2);
 debug.addProject('Frontend development', 'Design UI according to spec doc. Implement website\'s frontend using React and Bootstrap', 3);
-debug.addProject('Backend development', 'Design and create MongoDB database, implement Express server', 5);
-debug.addProject('Testing', 'Test the website following the spec doc. Document bugs, issues and missing features.', 1);
 //# sourceMappingURL=app.js.map

@@ -176,7 +176,8 @@ class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> implements 
 
     @Autobind
     dragStartHandler(event: DragEvent) {
-        console.log(event);
+        event.dataTransfer!.setData('text/plain', this.project.id);
+        event.dataTransfer!.effectAllowed = 'move';
     }
 
     @Autobind
@@ -213,13 +214,16 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> implements Drag
 
     @Autobind
     dragOverHandler(event: DragEvent) {
-        const listElement = this.mainElement.querySelector('ul')!;// as HTMLUListElement;
-        listElement.classList.add('droppable');
+        if(event.dataTransfer && event.dataTransfer.types[0] === 'text/plain'){ //is the data attached to our drag event in text format
+            event.preventDefault(); //in JS drag only allowed if preventDefault()
+            const listElement = this.mainElement.querySelector('ul')!;// as HTMLUListElement;
+            listElement.classList.add('droppable');
+        }        
     }
 
     @Autobind
     dropHandler(event: DragEvent) {
-
+        let id = event.dataTransfer!.getData('text/plain');
     }
 
     @Autobind
@@ -351,7 +355,7 @@ debug.addProject(
     3
     );
 
-debug.addProject(
+/*debug.addProject(
     'Backend development',
     'Design and create MongoDB database, implement Express server',
     5
@@ -361,5 +365,5 @@ debug.addProject(
     'Testing',
     'Test the website following the spec doc. Document bugs, issues and missing features.',
     1
-    );
+    );*/
 
