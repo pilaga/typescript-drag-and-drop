@@ -107,6 +107,14 @@ class ProjectState extends State<Project> {
         this.callListeners();
     }
 
+    moveProject(id: string, newStatus: ProjectStatus) {
+        const project = this.projects.find(project => project.id === id);
+        if(project && project.status != newStatus) {
+            project.status = newStatus;
+            this.callListeners();
+        }        
+    }
+
     private callListeners() {
         for(const listenerFunction of this.listeners) {
             listenerFunction(this.projects.slice());    //slice() to only return a copy
@@ -223,7 +231,12 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> implements Drag
 
     @Autobind
     dropHandler(event: DragEvent) {
-        let id = event.dataTransfer!.getData('text/plain');
+        const id = event.dataTransfer!.getData('text/plain');
+        projectState.moveProject(id, this.type === 'active' ? ProjectStatus.Active : ProjectStatus.Finished);
+
+        //clear background
+        const listElement = this.mainElement.querySelector('ul')!;
+        listElement.classList.remove('droppable');
     }
 
     @Autobind
