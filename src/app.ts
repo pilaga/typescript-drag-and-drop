@@ -46,6 +46,19 @@ function validateUserInput(validatableInput: Validatable) {
 }
 
 //-----------------------------------------------------------------------------------------------------
+// Drag and Drop interfaces
+interface Draggable { //ProjectItem objects are draggable
+    dragStartHandler(event: DragEvent): void;
+    dragEndHandler(event: DragEvent): void;
+}
+
+interface DragTarget { //ProjectList objects are drag targets
+    dragOverHandler(event: DragEvent): void;
+    dropHandler(event: DragEvent): void;
+    dragLeaveHandler(event: DragEvent): void;
+}
+
+//-----------------------------------------------------------------------------------------------------
 //project item class
 enum ProjectStatus { Active, Finished }
 
@@ -136,7 +149,7 @@ abstract class Component<T extends HTMLElement, U extends HTMLElement> {
 
 //-----------------------------------------------------------------------------------------------------
 //project item class
-class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
+class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> implements Draggable {
     private project: Project;
 
     get persons() {
@@ -161,7 +174,20 @@ class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
         this.mainElement.querySelector('p')!.textContent = this.project.description;
     }
 
-    configure() {}
+    @Autobind
+    dragStartHandler(event: DragEvent) {
+        console.log(event);
+    }
+
+    @Autobind
+    dragEndHandler(event: DragEvent) {
+        console.log('DragEnd');
+    }
+
+    configure() {
+        this.mainElement.addEventListener('dragstart', this.dragStartHandler);
+        this.mainElement.addEventListener('dragend', this.dragEndHandler);
+    }
 }
 
 //-----------------------------------------------------------------------------------------------------
@@ -286,3 +312,31 @@ class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
 const project = new ProjectInput();
 const activeProjectList = new ProjectList('active');
 const finishedProjectList = new ProjectList('finished');
+
+//debug
+let debug = ProjectState.getInstance();
+
+debug.addProject(
+    'Specs, sitemap and wireframe',
+    'Write full specificaton document according to customer\'s requirements. Generate sitemap and wireframes.',
+    2
+    );
+
+debug.addProject(
+    'Frontend development',
+    'Design UI according to spec doc. Implement website\'s frontend using React and Bootstrap',
+    3
+    );
+
+debug.addProject(
+    'Backend development',
+    'Design and create MongoDB database, implement Express server',
+    5
+    );
+
+debug.addProject(
+    'Testing',
+    'Test the website following the spec doc. Document bugs, issues and missing features.',
+    1
+    );
+

@@ -117,8 +117,23 @@ class ProjectItem extends Component {
         this.mainElement.querySelector('h3').textContent = this.persons + ' assigned';
         this.mainElement.querySelector('p').textContent = this.project.description;
     }
-    configure() { }
+    dragStartHandler(event) {
+        console.log(event);
+    }
+    dragEndHandler(event) {
+        console.log('DragEnd');
+    }
+    configure() {
+        this.mainElement.addEventListener('dragstart', this.dragStartHandler);
+        this.mainElement.addEventListener('dragend', this.dragEndHandler);
+    }
 }
+__decorate([
+    Autobind
+], ProjectItem.prototype, "dragStartHandler", null);
+__decorate([
+    Autobind
+], ProjectItem.prototype, "dragEndHandler", null);
 class ProjectList extends Component {
     constructor(type) {
         super('project-list', 'app', false, `${type}-projects`);
@@ -213,4 +228,9 @@ __decorate([
 const project = new ProjectInput();
 const activeProjectList = new ProjectList('active');
 const finishedProjectList = new ProjectList('finished');
+let debug = ProjectState.getInstance();
+debug.addProject('Specs, sitemap and wireframe', 'Write full specificaton document according to customer\'s requirements. Generate sitemap and wireframes.', 2);
+debug.addProject('Frontend development', 'Design UI according to spec doc. Implement website\'s frontend using React and Bootstrap', 3);
+debug.addProject('Backend development', 'Design and create MongoDB database, implement Express server', 5);
+debug.addProject('Testing', 'Test the website following the spec doc. Document bugs, issues and missing features.', 1);
 //# sourceMappingURL=app.js.map
