@@ -104,9 +104,17 @@ class ProjectItem extends Component {
         this.configure();
         this.render();
     }
+    get persons() {
+        if (this.project.team === 1) {
+            return '1 person';
+        }
+        else {
+            return `${this.project.team} persons`;
+        }
+    }
     render() {
         this.mainElement.querySelector('h2').textContent = this.project.title;
-        this.mainElement.querySelector('h3').textContent = this.project.team.toString();
+        this.mainElement.querySelector('h3').textContent = this.persons + ' assigned';
         this.mainElement.querySelector('p').textContent = this.project.description;
     }
     configure() { }
