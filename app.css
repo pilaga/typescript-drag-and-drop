@@ -3,19 +3,23 @@
 }
 
 html {
-  font-family: "Helvetica Neue", Helvetica, sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 body {
   margin: 0;
-  width: 80%;
+  width: 100%;
+}
+
+form {
+  width: 30%;
 }
 
 label,
 input,
 textarea {
   display: block;
-  margin: 0.5rem 0;
+  margin: 0.5rem 0;  
 }
 
 label {
@@ -59,6 +63,9 @@ button:active {
 .projects {
   margin: 1rem;
   border: 1px solid #FF9C00;
+  float: left;
+  width:40%;
+
 }
 
 .projects header {
