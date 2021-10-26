@@ -75,6 +75,10 @@ class ProjectState extends State {
         this.projects.push(newProject);
         this.callListeners();
     }
+    deleteProject(id) {
+        this.projects.splice(this.projects.findIndex(item => item.id === id), 1);
+        this.callListeners();
+    }
     moveProject(id, newStatus) {
         const project = this.projects.find(project => project.id === id);
         if (project && project.status != newStatus) {
@@ -131,9 +135,13 @@ class ProjectItem extends Component {
     dragEndHandler(event) {
         console.log('DragEnd');
     }
+    deleteProjectHandler(event) {
+        projectState.deleteProject(this.project.id);
+    }
     configure() {
         this.mainElement.addEventListener('dragstart', this.dragStartHandler);
         this.mainElement.addEventListener('dragend', this.dragEndHandler);
+        this.mainElement.querySelector('button').addEventListener('click', this.deleteProjectHandler);
     }
 }
 __decorate([
@@ -142,6 +150,9 @@ __decorate([
 __decorate([
     Autobind
 ], ProjectItem.prototype, "dragEndHandler", null);
+__decorate([
+    Autobind
+], ProjectItem.prototype, "deleteProjectHandler", null);
 class ProjectList extends Component {
     constructor(type) {
         super('project-list', 'app', false, `${type}-projects`);
@@ -270,4 +281,6 @@ const finishedProjectList = new ProjectList('finished');
 let debug = ProjectState.getInstance();
 debug.addProject('Specs, sitemap and wireframe', 'Write full specificaton document according to customer\'s requirements. Generate sitemap and wireframes.', 2);
 debug.addProject('Frontend development', 'Design UI according to spec doc. Implement website\'s frontend using React and Bootstrap', 3);
+debug.addProject('Backend development', 'Design and create MongoDB database, implement Express server', 5);
+debug.addProject('Testing', 'Test the website following the spec doc. Document bugs, issues and missing features.', 1);
 //# sourceMappingURL=app.js.map

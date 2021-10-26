@@ -89,7 +89,7 @@ button:active {
 }
 
 .projects li {
-  box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.26);
+  box-shadow: 1px 1px 1px 2px rgba(0, 0, 0, 0.26);
   padding: 1rem;
   margin: 1rem;
   background-color: white;
@@ -126,4 +126,22 @@ button:active {
   padding: 1rem;
   border: 1px solid #FF9C00;
   background: #f7f7f7;
+}
+
+#move-project {
+  font: inherit;
+  background: white;
+  border: 1px solid #575757;
+  cursor: pointer;
+  color: #575757;
+  padding: 0.75rem 1rem;
+}
+
+#delete-project {
+  font: inherit;
+  background: white;
+  border: 1px solid rgb(255, 88, 88);
+  cursor: pointer;
+  color: rgb(255, 88, 88);
+  padding: 0.75rem 1rem;
 }

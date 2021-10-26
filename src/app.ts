@@ -107,6 +107,11 @@ class ProjectState extends State<Project> {
         this.callListeners();
     }
 
+    deleteProject(id: string) {
+        this.projects.splice(this.projects.findIndex(item => item.id === id), 1);
+        this.callListeners();
+    }
+
     moveProject(id: string, newStatus: ProjectStatus) {
         const project = this.projects.find(project => project.id === id);
         if(project && project.status != newStatus) {
@@ -193,9 +198,17 @@ class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> implements 
         console.log('DragEnd');
     }
 
+    @Autobind
+    deleteProjectHandler(event: Event) {
+        projectState.deleteProject(this.project.id);
+    }
+
     configure() {
         this.mainElement.addEventListener('dragstart', this.dragStartHandler);
         this.mainElement.addEventListener('dragend', this.dragEndHandler);
+
+        //delete button
+        this.mainElement.querySelector('button')!.addEventListener('click', this.deleteProjectHandler);
     }
 }
 
@@ -368,7 +381,7 @@ debug.addProject(
     3
     );
 
-/*debug.addProject(
+debug.addProject(
     'Backend development',
     'Design and create MongoDB database, implement Express server',
     5
@@ -378,5 +391,5 @@ debug.addProject(
     'Testing',
     'Test the website following the spec doc. Document bugs, issues and missing features.',
     1
-    );*/
+    );
 
