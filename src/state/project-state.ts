@@ -1,4 +1,4 @@
-import { Project, ProjectStatus } from "../models/project.js";
+import { Project, ProjectStatus } from "../models/project";
 
 //Listener type is a function that receives an array of projects
 type Listener<T> = (items: T[]) => void; 
