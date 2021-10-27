@@ -1,6 +1,6 @@
-import { Component } from "./base-component.js";
-import { Validatable, validateUserInput } from "../utils/form-validation.js";
-import { Autobind } from "../decorators/autobind.js";
+import Component from "./base-component.js";
+import * as Validation from "../utils/form-validation.js";
+import { Autobind as AutoBind } from "../decorators/autobind.js";
 import { projectState } from "../state/project-state.js";
 
 //project input class
@@ -25,16 +25,16 @@ export class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
         const inputDesc = this.descInputElement.value;
         const inputTeam = this.teamInputElement.value;
 
-        const titleValidatable: Validatable = {
+        const titleValidatable: Validation.Validatable = {
             value: inputTitle,
             required: true
         }
-        const descValidatable: Validatable = {
+        const descValidatable: Validation.Validatable = {
             value: inputDesc,
             required: true,
             minLength: 5
         }
-        const teamValidatable: Validatable = {
+        const teamValidatable: Validation.Validatable = {
             value: +inputTeam,
             required: true,
             minValue: 1,
@@ -43,9 +43,9 @@ export class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
 
         //check input
         if(
-            !validateUserInput(titleValidatable) ||
-            !validateUserInput(descValidatable) ||
-            !validateUserInput(teamValidatable)) {
+            !Validation.validateUserInput(titleValidatable) ||
+            !Validation.validateUserInput(descValidatable) ||
+            !Validation.validateUserInput(teamValidatable)) {
                 console.log('error, please check input')
                 return;
         } else {
@@ -59,7 +59,7 @@ export class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
         this.teamInputElement.value = "";
     }
 
-    @Autobind
+    @AutoBind
     private submitHandler(event: Event) {
         event.preventDefault();
         const userInput = this.fetchUserInput();

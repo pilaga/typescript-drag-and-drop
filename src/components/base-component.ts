@@ -1,6 +1,6 @@
 
 //project list class
-export abstract class Component<T extends HTMLElement, U extends HTMLElement> {
+export default abstract class Component<T extends HTMLElement, U extends HTMLElement> {
     templateElement: HTMLTemplateElement;
     appElement: T;
     mainElement: U;
