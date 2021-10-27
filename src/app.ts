@@ -1,3 +1,7 @@
+/// <reference path="drag-drop-interfaces.ts" />
+/// <reference path="project-model.ts" />
+
+namespace App {
 //-----------------------------------------------------------------------------------------------------
 //autobind decorator
 function Autobind(target: any, methodName: string | Symbol, descriptor: PropertyDescriptor) {
@@ -46,31 +50,7 @@ function validateUserInput(validatableInput: Validatable) {
 }
 
 //-----------------------------------------------------------------------------------------------------
-// Drag and Drop interfaces
-interface Draggable { //ProjectItem objects are draggable
-    dragStartHandler(event: DragEvent): void;
-    dragEndHandler(event: DragEvent): void;
-}
 
-interface DragTarget { //ProjectList objects are drag targets
-    dragOverHandler(event: DragEvent): void;
-    dropHandler(event: DragEvent): void;
-    dragLeaveHandler(event: DragEvent): void;
-}
-
-//-----------------------------------------------------------------------------------------------------
-//project item class
-enum ProjectStatus { Active, Finished }
-
-class Project {
-    constructor(
-        public id: string,
-        public title: string,
-        public description: string,
-        public team: number,
-        public status: ProjectStatus
-        ) {}
-}
 
 //Listener type is a function that receives an array of projects
 type Listener<T> = (items: T[]) => void; 
@@ -392,4 +372,4 @@ debug.addProject(
     'Test the website following the spec doc. Document bugs, issues and missing features.',
     1
     );
-
+}
