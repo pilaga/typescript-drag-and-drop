@@ -1,14 +1,13 @@
-
-//autobind decorator
-export function Autobind(target: any, methodName: string | Symbol, descriptor: PropertyDescriptor) {
+export function Autobind(target, methodName, descriptor) {
     const originalMethod = descriptor.value;
-    const adjustedDescriptor: PropertyDescriptor = {
+    const adjustedDescriptor = {
         configurable: true,
         enumerable: false,
         get() {
             const boundFunction = originalMethod.bind(this);
-            return boundFunction; 
+            return boundFunction;
         }
     };
     return adjustedDescriptor;
 }
+//# sourceMappingURL=autobind.js.map
